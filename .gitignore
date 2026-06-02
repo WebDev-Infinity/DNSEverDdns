@@ -1,0 +1,66 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+publish/
+publish-artifacts/
+artifacts/
+
+# Visual Studio and Rider
+.vs/
+.vscode/
+.idea/
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Legacy DNSEver Windows client package
+DNSEverDDNSClient/
+
+# Debug symbols and generated packages
+*.pdb
+*.mdb
+*.nupkg
+*.snupkg
+*.symbols.nupkg
+
+# Logs
+*.log
+logs/
+log/
+
+# Local application data and settings
+settings.json
+appsettings.Development.json
+*.local.json
+*.secrets.json
+
+# Test and coverage output
+TestResults/
+coverage/
+coverage.*
+*.coverage
+*.coveragexml
+*.trx
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# NuGet
+packages/
+*.nuget.props
+*.nuget.targets
+project.lock.json
+project.assets.json
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.cache
+*.swp
+~$*
