@@ -64,9 +64,10 @@ public sealed class SettingsForm : Form
     private void BuildLayout()
     {
         Text = "DNSEver DDNS 설정";
-        Width = 760;
-        Height = 720;
-        MinimumSize = new Size(720, 690);
+        AutoScaleMode = AutoScaleMode.Dpi;
+        Font = new Font("맑은 고딕", GetDefaultFontSize(), FontStyle.Regular, GraphicsUnit.Point);
+        ClientSize = new Size(760, 700);
+        MinimumSize = Size;
         MaximumSize = Size;
         FormBorderStyle = FormBorderStyle.FixedSingle;
         MaximizeBox = false;
@@ -76,18 +77,28 @@ public sealed class SettingsForm : Form
         var root = new TableLayoutPanel
         {
             Dock = DockStyle.Fill,
-            Padding = new Padding(18),
+            Padding = new Padding(22),
             ColumnCount = 1,
             RowCount = 3
         };
         root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        root.RowStyles.Add(new RowStyle(SizeType.Absolute, 196));
+        root.RowStyles.Add(new RowStyle(SizeType.Absolute, 220));
         root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
         root.Controls.Add(CreateTopPanel(), 0, 0);
         root.Controls.Add(CreateHostSectionPanel(), 0, 1);
         root.Controls.Add(CreateBottomPanel(), 0, 2);
         Controls.Add(root);
+    }
+
+    /// <summary>
+    /// 현재 주 화면 해상도에 맞는 기본 글꼴 크기를 반환합니다.
+    /// </summary>
+    private static float GetDefaultFontSize()
+    {
+        var bounds = Screen.PrimaryScreen?.Bounds ?? Rectangle.Empty;
+
+        return bounds.Width >= 3840 || bounds.Height >= 2160 ? 9F : 10.5F;
     }
 
     /// <summary>
@@ -103,25 +114,25 @@ public sealed class SettingsForm : Form
             RowCount = 3,
             Padding = new Padding(0, 0, 0, 14)
         };
-        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 116));
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 128));
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 58));
-        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 36));
-        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 36));
+        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 62));
+        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 42));
+        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 42));
 
         var titleLabel = new Label
         {
             Text = "DNSEver DDNS",
             Dock = DockStyle.Fill,
-            Font = new Font(Font.FontFamily, 18, FontStyle.Bold),
+            Font = new Font(Font.FontFamily, 20, FontStyle.Bold),
             TextAlign = ContentAlignment.MiddleLeft
         };
         panel.Controls.Add(titleLabel, 0, 0);
         panel.SetColumnSpan(titleLabel, 2);
 
         _authCodeTextBox.UseSystemPasswordChar = true;
-        _userIdTextBox.Height = 28;
-        _authCodeTextBox.Height = 28;
+        _userIdTextBox.Height = 32;
+        _authCodeTextBox.Height = 32;
 
         AddRow(panel, 1, "아이디", _userIdTextBox);
         AddRow(panel, 2, "인증 코드", _authCodeTextBox);
@@ -141,10 +152,10 @@ public sealed class SettingsForm : Form
             RowCount = 2,
             Padding = new Padding(0, 10, 0, 10)
         };
-        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 116));
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 128));
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         panel.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 42));
+        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 46));
 
         var label = new Label
         {
@@ -169,7 +180,7 @@ public sealed class SettingsForm : Form
             Padding = new Padding(0, 4, 0, 0)
         };
 
-        var lookupHostsButton = new Button { Text = "호스트 조회", Width = 146, Height = 34 };
+        var lookupHostsButton = new Button { Text = "호스트 조회", Width = 158, Height = 38 };
         lookupHostsButton.Click += async (_, _) => await TestHostsAsync();
 
         buttonPanel.Controls.Add(lookupHostsButton);
@@ -193,34 +204,34 @@ public sealed class SettingsForm : Form
             RowCount = 6,
             Padding = new Padding(0, 6, 0, 0)
         };
-        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 116));
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 128));
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
         _currentIpTextBox.ReadOnly = true;
-        _currentIpTextBox.Height = 28;
-        _overrideIpTextBox.Height = 28;
+        _currentIpTextBox.Height = 32;
+        _overrideIpTextBox.Height = 32;
         _intervalNumericUpDown.Minimum = 1;
         _intervalNumericUpDown.Maximum = 1440;
-        _intervalNumericUpDown.Height = 28;
+        _intervalNumericUpDown.Height = 32;
 
-        AddRow(panel, 0, "현재 IP", CreateCurrentIpPanel(), 46);
-        AddRow(panel, 1, "지정 IP", _overrideIpTextBox);
-        AddRow(panel, 2, "주기(분)", _intervalNumericUpDown);
+        AddRow(panel, 0, "현재 IP", CreateCurrentIpPanel(), 50);
+        AddRow(panel, 1, "지정 IP", _overrideIpTextBox, 42);
+        AddRow(panel, 2, "주기(분)", _intervalNumericUpDown, 42);
 
         _darkThemeCheckBox.Text = "어두운 테마 사용";
         _darkThemeCheckBox.AutoSize = true;
         _darkThemeCheckBox.Dock = DockStyle.Top;
         _darkThemeCheckBox.Margin = new Padding(0, 8, 0, 3);
         _darkThemeCheckBox.CheckedChanged += (_, _) => ApplyTheme(_darkThemeCheckBox.Checked);
-        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 42));
+        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 46));
         panel.Controls.Add(_darkThemeCheckBox, 1, 3);
 
         _statusLabel.AutoSize = true;
         _statusLabel.Padding = new Padding(0, 6, 0, 0);
-        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 38));
+        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 42));
         panel.Controls.Add(_statusLabel, 1, 4);
 
-        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 44));
+        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 48));
         panel.Controls.Add(CreateButtonPanel(), 1, 5);
 
         return panel;
@@ -238,13 +249,13 @@ public sealed class SettingsForm : Form
             RowCount = 1,
             Margin = Padding.Empty
         };
-        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
+        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 44));
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 112));
-        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 146));
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 124));
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 158));
 
-        var lookupButton = new Button { Text = "IP 조회", Dock = DockStyle.Fill, Width = 112, Height = 38 };
-        var applyButton = new Button { Text = "지정 IP 적용", Dock = DockStyle.Fill, Width = 146, Height = 38 };
+        var lookupButton = new Button { Text = "IP 조회", Dock = DockStyle.Fill, Width = 124, Height = 40 };
+        var applyButton = new Button { Text = "지정 IP 적용", Dock = DockStyle.Fill, Width = 158, Height = 40 };
 
         lookupButton.Click += async (_, _) => await LookupCurrentIpAsync(applyToOverride: false);
         applyButton.Click += async (_, _) => await LookupCurrentIpAsync(applyToOverride: true);
@@ -289,8 +300,8 @@ public sealed class SettingsForm : Form
             Padding = new Padding(0, 4, 0, 0)
         };
 
-        var saveButton = new Button { Text = "저장", Width = 112, Height = 34 };
-        var closeButton = new Button { Text = "닫기", Width = 112, Height = 34 };
+        var saveButton = new Button { Text = "저장", Width = 124, Height = 38 };
+        var closeButton = new Button { Text = "닫기", Width = 124, Height = 38 };
 
         saveButton.Click += (_, _) => SaveSettings();
         closeButton.Click += (_, _) => Close();
