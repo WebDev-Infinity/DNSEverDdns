@@ -19,6 +19,7 @@ artifacts/
 DNSEverDDNSClient/
 
 # Debug symbols and generated packages
+*.exe
 *.pdb
 *.mdb
 *.nupkg

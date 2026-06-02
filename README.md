@@ -20,7 +20,7 @@ DNSEver DDNS Windows Client는 DNSEver의 다이나믹 DNS를 Windows 환경에�
 - 현재 공인 IP 조회 및 지정 IP 자동 적용
 - Windows 트레이 아이콘 상주 실행
 - 시작 시 설정이 완료되어 있으면 트레이로 최소화 실행
-- 업데이트 주기 설정
+- 업데이트 주기 설정(기본 60분)
 - 어두운 테마와 밝은 테마 선택
 - Windows DPAPI `CurrentUser` 범위로 인증 코드 암호화 저장
 - `%LOCALAPPDATA%\DNSEverDdns\settings.json` 설정 저장
@@ -51,13 +51,15 @@ dotnet build .\DNSEverDdns.slnx
 dotnet run --project .\DNSEverDdns.Win\DNSEverDdns.Win.csproj
 ```
 
+자세한 초기 설정과 사용 방법은 [USAGE.md](USAGE.md)를 참고하세요.
+
 처음 실행하면 설정 화면이 표시됩니다.
 
 1. DNSEver 사용자 아이디를 입력합니다.
 2. DNSEver DDNS 인증 코드를 입력합니다.
 3. `호스트 조회` 버튼으로 DNSEver에 등록된 호스트 목록을 가져옵니다.
 4. DDNS 업데이트 대상 호스트를 선택합니다.
-5. 필요한 경우 지정 IP와 업데이트 주기를 설정합니다.
+5. 필요한 경우 지정 IP와 업데이트 주기를 설정합니다. 기본 업데이트 주기는 60분입니다.
 6. 저장하면 트레이에서 주기적으로 업데이트가 수행됩니다.
 
 ## 배포 예시

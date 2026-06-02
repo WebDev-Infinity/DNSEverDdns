@@ -57,7 +57,7 @@ public sealed class AppSettings
     /// <summary>
     /// 업데이트 주기(분)입니다.
     /// </summary>
-    public int UpdateIntervalMinutes { get; set; } = 10;
+    public int UpdateIntervalMinutes { get; set; } = 60;
 
     /// <summary>
     /// 어두운 테마 사용 여부입니다.

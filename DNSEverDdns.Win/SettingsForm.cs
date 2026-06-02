@@ -23,6 +23,17 @@ public sealed class SettingsForm : Form
     public event EventHandler<AppSettings>? SettingsSaved;
 
     /// <summary>
+    /// Windows Forms 디자이너에서 설정 화면을 표시하기 위한 기본 생성자입니다.
+    /// </summary>
+    public SettingsForm()
+    {
+        _settingsStore = new AppSettingsStore();
+        BuildLayout();
+        LoadSettings(new AppSettings());
+        ApplyTheme(useDarkTheme: false);
+    }
+
+    /// <summary>
     /// 저장소와 현재 설정을 사용하여 화면을 초기화합니다.
     /// </summary>
     public SettingsForm(AppSettingsStore settingsStore, AppSettings settings)
@@ -53,10 +64,14 @@ public sealed class SettingsForm : Form
     private void BuildLayout()
     {
         Text = "DNSEver DDNS 설정";
-        Width = 670;
-        Height = 610;
-        MinimumSize = new Size(650, 590);
+        Width = 760;
+        Height = 720;
+        MinimumSize = new Size(720, 690);
+        MaximumSize = Size;
+        FormBorderStyle = FormBorderStyle.FixedSingle;
+        MaximizeBox = false;
         StartPosition = FormStartPosition.CenterScreen;
+        Icon = AppIcon.Load();
 
         var root = new TableLayoutPanel
         {
@@ -66,73 +81,147 @@ public sealed class SettingsForm : Form
             RowCount = 3
         };
         root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+        root.RowStyles.Add(new RowStyle(SizeType.Absolute, 196));
         root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
-        root.Controls.Add(CreateHeader(), 0, 0);
-        root.Controls.Add(CreateSettingsPanel(), 0, 1);
-        root.Controls.Add(CreateButtonPanel(), 0, 2);
+        root.Controls.Add(CreateTopPanel(), 0, 0);
+        root.Controls.Add(CreateHostSectionPanel(), 0, 1);
+        root.Controls.Add(CreateBottomPanel(), 0, 2);
         Controls.Add(root);
     }
 
     /// <summary>
-    /// 화면 상단 헤더 영역을 생성합니다.
+    /// 제목, 아이디, 인증 코드가 포함된 상단 패널을 생성합니다.
     /// </summary>
-    private Control CreateHeader()
+    private Control CreateTopPanel()
     {
-        return new Label
+        var panel = new TableLayoutPanel
         {
-            Text = "DNSEver DDNS",
             Dock = DockStyle.Top,
             AutoSize = true,
-            Font = new Font(Font.FontFamily, 18, FontStyle.Bold),
+            ColumnCount = 2,
+            RowCount = 3,
             Padding = new Padding(0, 0, 0, 14)
         };
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 116));
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 58));
+        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 36));
+        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 36));
+
+        var titleLabel = new Label
+        {
+            Text = "DNSEver DDNS",
+            Dock = DockStyle.Fill,
+            Font = new Font(Font.FontFamily, 18, FontStyle.Bold),
+            TextAlign = ContentAlignment.MiddleLeft
+        };
+        panel.Controls.Add(titleLabel, 0, 0);
+        panel.SetColumnSpan(titleLabel, 2);
+
+        _authCodeTextBox.UseSystemPasswordChar = true;
+        _userIdTextBox.Height = 28;
+        _authCodeTextBox.Height = 28;
+
+        AddRow(panel, 1, "아이디", _userIdTextBox);
+        AddRow(panel, 2, "인증 코드", _authCodeTextBox);
+
+        return panel;
     }
 
     /// <summary>
-    /// 설정 입력 영역을 생성합니다.
+    /// 호스트 목록과 호스트 조회 버튼이 포함된 가운데 패널을 생성합니다.
     /// </summary>
-    private Control CreateSettingsPanel()
+    private Control CreateHostSectionPanel()
     {
         var panel = new TableLayoutPanel
         {
             Dock = DockStyle.Fill,
             ColumnCount = 2,
-            RowCount = 8
+            RowCount = 2,
+            Padding = new Padding(0, 10, 0, 10)
         };
-        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 124));
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 116));
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        panel.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 42));
+
+        var label = new Label
+        {
+            Text = "호스트 목록",
+            Dock = DockStyle.Top,
+            TextAlign = ContentAlignment.MiddleLeft
+        };
+
+        _hostNamesCheckedListBox.CheckOnClick = true;
+        _hostNamesCheckedListBox.Dock = DockStyle.Fill;
+        _hostNamesCheckedListBox.HorizontalScrollbar = false;
+        _hostNamesCheckedListBox.IntegralHeight = false;
+        _hostNamesCheckedListBox.ScrollAlwaysVisible = true;
+        _hostNamesCheckedListBox.MinimumSize = new Size(0, 128);
+        _hostNamesCheckedListBox.Margin = new Padding(0, 3, 0, 3);
+
+        var buttonPanel = new FlowLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            FlowDirection = FlowDirection.RightToLeft,
+            Margin = Padding.Empty,
+            Padding = new Padding(0, 4, 0, 0)
+        };
+
+        var lookupHostsButton = new Button { Text = "호스트 조회", Width = 146, Height = 34 };
+        lookupHostsButton.Click += async (_, _) => await TestHostsAsync();
+
+        buttonPanel.Controls.Add(lookupHostsButton);
+        panel.Controls.Add(label, 0, 0);
+        panel.Controls.Add(_hostNamesCheckedListBox, 1, 0);
+        panel.Controls.Add(buttonPanel, 1, 1);
+
+        return panel;
+    }
+
+    /// <summary>
+    /// IP, 주기, 테마, 상태 메시지, 저장 버튼이 포함된 하단 패널을 생성합니다.
+    /// </summary>
+    private Control CreateBottomPanel()
+    {
+        var panel = new TableLayoutPanel
+        {
+            Dock = DockStyle.Top,
+            AutoSize = true,
+            ColumnCount = 2,
+            RowCount = 6,
+            Padding = new Padding(0, 6, 0, 0)
+        };
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 116));
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
-        _authCodeTextBox.UseSystemPasswordChar = true;
-        _hostNamesCheckedListBox.CheckOnClick = true;
-        _hostNamesCheckedListBox.Height = 110;
         _currentIpTextBox.ReadOnly = true;
         _currentIpTextBox.Height = 28;
         _overrideIpTextBox.Height = 28;
-        _userIdTextBox.Height = 28;
-        _authCodeTextBox.Height = 28;
         _intervalNumericUpDown.Minimum = 1;
         _intervalNumericUpDown.Maximum = 1440;
         _intervalNumericUpDown.Height = 28;
 
-        AddRow(panel, 0, "아이디", _userIdTextBox);
-        AddRow(panel, 1, "인증 코드", _authCodeTextBox);
-        AddRow(panel, 2, "호스트", _hostNamesCheckedListBox);
-        AddRow(panel, 3, "현재 IP", CreateCurrentIpPanel(), 46);
-        AddRow(panel, 4, "지정 IP", _overrideIpTextBox);
-        AddRow(panel, 5, "주기(분)", _intervalNumericUpDown);
+        AddRow(panel, 0, "현재 IP", CreateCurrentIpPanel(), 46);
+        AddRow(panel, 1, "지정 IP", _overrideIpTextBox);
+        AddRow(panel, 2, "주기(분)", _intervalNumericUpDown);
 
         _darkThemeCheckBox.Text = "어두운 테마 사용";
         _darkThemeCheckBox.AutoSize = true;
         _darkThemeCheckBox.Dock = DockStyle.Top;
-        _darkThemeCheckBox.Margin = new Padding(0, 6, 0, 3);
+        _darkThemeCheckBox.Margin = new Padding(0, 8, 0, 3);
         _darkThemeCheckBox.CheckedChanged += (_, _) => ApplyTheme(_darkThemeCheckBox.Checked);
-        panel.Controls.Add(_darkThemeCheckBox, 1, 6);
+        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 42));
+        panel.Controls.Add(_darkThemeCheckBox, 1, 3);
 
         _statusLabel.AutoSize = true;
-        _statusLabel.Padding = new Padding(0, 12, 0, 0);
-        panel.Controls.Add(_statusLabel, 1, 7);
+        _statusLabel.Padding = new Padding(0, 6, 0, 0);
+        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 38));
+        panel.Controls.Add(_statusLabel, 1, 4);
+
+        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 44));
+        panel.Controls.Add(CreateButtonPanel(), 1, 5);
 
         return panel;
     }
@@ -180,9 +269,9 @@ public sealed class SettingsForm : Form
             TextAlign = ContentAlignment.MiddleLeft
         };
 
-        inputControl.Dock = row == 2 ? DockStyle.Fill : DockStyle.Top;
+        inputControl.Dock = inputControl is TableLayoutPanel ? DockStyle.Fill : DockStyle.Top;
         inputControl.Margin = new Padding(0, 3, 0, 3);
-        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, row == 2 ? 120 : rowHeight));
+        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, rowHeight));
         panel.Controls.Add(label, 0, row);
         panel.Controls.Add(inputControl, 1, row);
     }
@@ -197,19 +286,16 @@ public sealed class SettingsForm : Form
             Dock = DockStyle.Fill,
             FlowDirection = FlowDirection.RightToLeft,
             AutoSize = true,
-            Padding = new Padding(0, 16, 0, 0)
+            Padding = new Padding(0, 4, 0, 0)
         };
 
         var saveButton = new Button { Text = "저장", Width = 112, Height = 34 };
-        var testButton = new Button { Text = "호스트 조회", Width = 146, Height = 34 };
         var closeButton = new Button { Text = "닫기", Width = 112, Height = 34 };
 
         saveButton.Click += (_, _) => SaveSettings();
-        testButton.Click += async (_, _) => await TestHostsAsync();
         closeButton.Click += (_, _) => Close();
 
         panel.Controls.Add(saveButton);
-        panel.Controls.Add(testButton);
         panel.Controls.Add(closeButton);
 
         return panel;

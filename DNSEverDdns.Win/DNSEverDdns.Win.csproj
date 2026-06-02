@@ -17,6 +17,23 @@
     <SelfContained>false</SelfContained>
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
+    <ApplicationIcon>Assets\app-icon.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <Target Name="RenamePublishedExecutable" AfterTargets="Publish" Condition="'$(RuntimeIdentifier)' != ''">
+    <PropertyGroup>
+      <PublishedExecutablePath>$(PublishDir)$(AssemblyName).exe</PublishedExecutablePath>
+      <RenamedExecutablePath>$(PublishDir)DNSEverDdns-$(InformationalVersion)-$(RuntimeIdentifier).exe</RenamedExecutablePath>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PreviousPublishedExecutables Include="$(PublishDir)DNSEverDdns-*.exe" />
+    </ItemGroup>
+
+    <Delete Files="@(PreviousPublishedExecutables)" />
+    <Move SourceFiles="$(PublishedExecutablePath)"
+          DestinationFiles="$(RenamedExecutablePath)"
+          Condition="Exists('$(PublishedExecutablePath)')" />
+  </Target>
 
 </Project>

@@ -71,7 +71,7 @@ public sealed class DdnsApplicationContext : ApplicationContext
 
         var notifyIcon = new NotifyIcon
         {
-            Icon = SystemIcons.Application,
+            Icon = AppIcon.Load(),
             Text = "DNSEver DDNS",
             Visible = true,
             ContextMenuStrip = menu
