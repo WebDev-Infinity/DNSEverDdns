@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\DNSEverDdns.Core\DNSEverDdns.Core.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>10.0</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>false</SelfContained>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
+  <Target Name="RenamePublishedExecutable" AfterTargets="Publish" Condition="'$(RuntimeIdentifier)' != ''">
+    <PropertyGroup>
+      <PublishedExecutablePath>$(PublishDir)$(AssemblyName)</PublishedExecutablePath>
+      <RenamedExecutablePath>$(PublishDir)DNSEverDdns-$(InformationalVersion)-$(RuntimeIdentifier)</RenamedExecutablePath>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PreviousPublishedExecutables Include="$(PublishDir)DNSEverDdns-*-$(RuntimeIdentifier)" />
+    </ItemGroup>
+
+    <Delete Files="@(PreviousPublishedExecutables)" />
+    <Move SourceFiles="$(PublishedExecutablePath)"
+          DestinationFiles="$(RenamedExecutablePath)"
+          Condition="Exists('$(PublishedExecutablePath)')" />
+  </Target>
+
+</Project>

@@ -10,6 +10,7 @@ DNSEver DDNS Windows Client는 DNSEver의 다이나믹 DNS를 Windows 환경에�
 
 - `DNSEverDdns.Core`: DNSEver DDNS API 호출, Basic 인증 헤더 생성, XML 응답 파싱, 결과 모델을 담당하는 핵심 라이브러리입니다.
 - `DNSEverDdns.Win`: Windows Forms 기반 트레이 애플리케이션입니다. 사용자 설정, 호스트 조회, 주기적 DDNS 업데이트, 로그 기록을 처리합니다.
+- `DNSEverDdns.Linux`: Linux 명령줄 클라이언트입니다. 대화형 설정, 즉시 및 주기적 업데이트, systemd 사용자 서비스를 지원합니다.
 
 ## 주요 기능
 
@@ -102,6 +103,27 @@ Windows Forms 프로젝트의 `PublishSingleFile` 옵션을 사용하므로 아�
 - 버전 설정을 [Directory.Build.props](Directory.Build.props)에서 통합 관리합니다.
 
 자세한 변경 이력은 [CHANGELOG.md](CHANGELOG.md)를 참고하세요.
+
+## Linux 클라이언트
+
+Linux에서는 GUI 대신 명령줄과 systemd 사용자 서비스로 동작합니다.
+
+- 지원 아키텍처: `linux-x64`, `linux-arm64`
+- 설정 경로: `${XDG_CONFIG_HOME:-$HOME/.config}/DNSEverDdns/settings.json`
+- 설정 파일 권한: 사용자 읽기·쓰기 전용(`0600`)
+- 자동 실행: systemd user service
+- 로그 확인: `journalctl --user -u dnsever-ddns.service`
+
+주요 명령은 다음과 같습니다.
+
+```bash
+./DNSEverDdns-1.0.2026.0724-linux-x64 configure
+./DNSEverDdns-1.0.2026.0724-linux-x64 update
+./DNSEverDdns-1.0.2026.0724-linux-x64 install-service
+./DNSEverDdns-1.0.2026.0724-linux-x64 service-status
+```
+
+Linux 설치 및 사용 방법은 [LINUX.md](LINUX.md)를 참고하세요.
 
 ## 참고
 
