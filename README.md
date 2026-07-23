@@ -1,10 +1,19 @@
-# DNSEver DDNS Windows Client
+# DNSEver DDNS Windows / Linux Client
 
-DNSEver DDNS Windows Client는 DNSEver의 다이나믹 DNS를 Windows 환경에서 간단히 관리하기 위한 C# 기반 데스크톱 클라이언트입니다. DNSEver에서 제공하던 Windows용 다이나믹 DNS 클라이언트 지원이 중단된 상황을 보완하기 위해 제작되었습니다.
+DNSEver DDNS Client는 DNSEver의 다이나믹 DNS를 Windows와 Linux 환경에서 관리하기 위한 C# 기반 비공식 클라이언트입니다.
+
+Windows에서는 Windows Forms 기반 트레이 애플리케이션으로 동작하고, Linux에서는 서버·NAS·라즈베리파이 등 GUI가 없는 환경에서도 사용할 수 있는 명령줄 프로그램과 systemd 사용자 서비스를 제공합니다. DNSEver에서 제공하던 Windows용 다이나믹 DNS 클라이언트 지원이 중단된 상황을 보완하고 여러 운영체제에서 동일한 DDNS 기능을 사용할 수 있도록 제작되었습니다.
 
 이 프로젝트는 **DNSEver에 사전 허락을 받고 공개 저장소에 게시한 프로젝트**입니다. 다만 DNSEver의 공식 제품이나 공식 지원 도구는 아니며, DNSEver 서비스와 상표, API에 대한 권리는 DNSEver에 있습니다.
 
 현재 배포 버전은 `1.0.2026.0724`입니다.
+
+## 지원 운영체제
+
+| 운영체제 | 아키텍처 | 실행 방식 | 필요 런타임 |
+|---|---|---|---|
+| Windows | x64, x86, ARM64 | Windows Forms 및 트레이 앱 | .NET 10 Desktop Runtime |
+| Linux | x64, ARM64 | CLI 및 systemd 사용자 서비스 | .NET 10 Runtime |
 
 ## 프로젝트 구성
 
@@ -12,7 +21,7 @@ DNSEver DDNS Windows Client는 DNSEver의 다이나믹 DNS를 Windows 환경에�
 - `DNSEverDdns.Win`: Windows Forms 기반 트레이 애플리케이션입니다. 사용자 설정, 호스트 조회, 주기적 DDNS 업데이트, 로그 기록을 처리합니다.
 - `DNSEverDdns.Linux`: Linux 명령줄 클라이언트입니다. 대화형 설정, 즉시 및 주기적 업데이트, systemd 사용자 서비스를 지원합니다.
 
-## 주요 기능
+## 공통 주요 기능
 
 - DNSEver DDNS 인증 코드 기반 Basic 인증
 - DNSEver에 등록된 호스트 목록 조회
@@ -20,22 +29,34 @@ DNSEver DDNS Windows Client는 DNSEver의 다이나믹 DNS를 Windows 환경에�
 - 선택한 호스트의 DDNS 수동 및 주기적 업데이트
 - DNSEver 서버가 감지한 현재 IP 사용
 - 사용자가 지정한 IP로 DDNS 업데이트
+- 업데이트 주기 설정(기본 60분)
+- 이미 동일한 IP가 반영된 `721 Already Updated` 응답을 정상 상태로 처리
+- 운영체제 및 CPU 아키텍처별 단일 파일 게시 지원
+
+### Windows 주요 기능
+
 - 현재 공인 IP 조회 및 지정 IP 자동 적용
 - Windows 트레이 아이콘 상주 실행
 - 시작 시 설정이 완료되어 있으면 트레이로 최소화 실행
 - 사용자가 선택할 수 있는 Windows 시작프로그램 등록 및 해제
 - Windows 자동 시작 시 설정 창을 표시하지 않고 트레이에서 실행
-- 업데이트 주기 설정(기본 60분)
 - 어두운 테마와 밝은 테마 선택
-- 이미 동일한 IP가 반영된 `721 Already Updated` 응답을 정상 상태로 처리
 - Windows DPAPI `CurrentUser` 범위로 인증 코드 암호화 저장
 - `%LOCALAPPDATA%\DNSEverDdns\settings.json` 설정 저장
 - `%LOCALAPPDATA%\DNSEverDdns\logs` 로그 기록
-- 단일 파일 게시 설정 지원
 
-## 설정 저장 방식
+### Linux 주요 기능
 
-앱 설정은 현재 Windows 사용자 로컬 앱 데이터 폴더에 저장됩니다.
+- 터미널에서 대화형 초기 설정
+- 명령줄에서 DDNS 즉시 업데이트 및 지속 실행
+- systemd 사용자 서비스 등록, 해제 및 상태 확인
+- journalctl을 이용한 서비스 로그 확인
+- XDG 표준 경로에 설정 저장
+- 설정 디렉터리 `0700`, 설정 파일 `0600` 권한 적용
+
+## Windows 설정 저장 방식
+
+Windows 앱 설정은 현재 사용자 로컬 앱 데이터 폴더에 저장됩니다.
 
 ```text
 %LOCALAPPDATA%\DNSEverDdns\settings.json
@@ -59,7 +80,7 @@ HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run
 dotnet build .\DNSEverDdns.slnx
 ```
 
-## 실행
+## Windows 실행
 
 ```powershell
 dotnet run --project .\DNSEverDdns.Win\DNSEverDdns.Win.csproj
