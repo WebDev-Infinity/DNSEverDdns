@@ -63,4 +63,9 @@ public sealed class AppSettings
     /// 어두운 테마 사용 여부입니다.
     /// </summary>
     public bool UseDarkTheme { get; set; } = true;
+
+    /// <summary>
+    /// Windows 로그인 시 프로그램을 자동으로 시작할지 여부입니다.
+    /// </summary>
+    public bool StartWithWindows { get; set; }
 }

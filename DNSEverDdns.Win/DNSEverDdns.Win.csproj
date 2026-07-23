@@ -31,9 +31,7 @@
     </ItemGroup>
 
     <Delete Files="@(PreviousPublishedExecutables)" />
-    <Move SourceFiles="$(PublishedExecutablePath)"
-          DestinationFiles="$(RenamedExecutablePath)"
-          Condition="Exists('$(PublishedExecutablePath)')" />
+    <Move SourceFiles="$(PublishedExecutablePath)" DestinationFiles="$(RenamedExecutablePath)" Condition="Exists('$(PublishedExecutablePath)')" />
   </Target>
 
 </Project>

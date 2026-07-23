@@ -15,6 +15,7 @@ public sealed class SettingsForm : Form
     private readonly TextBox _overrideIpTextBox = new();
     private readonly NumericUpDown _intervalNumericUpDown = new();
     private readonly CheckBox _darkThemeCheckBox = new();
+    private readonly CheckBox _startWithWindowsCheckBox = new();
     private readonly Label _statusLabel = new();
 
     /// <summary>
@@ -66,7 +67,7 @@ public sealed class SettingsForm : Form
         Text = "DNSEver DDNS 설정";
         AutoScaleMode = AutoScaleMode.Dpi;
         Font = new Font("맑은 고딕", GetDefaultFontSize(), FontStyle.Regular, GraphicsUnit.Point);
-        ClientSize = new Size(760, 700);
+        ClientSize = new Size(760, 750);
         MinimumSize = Size;
         MaximumSize = Size;
         FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -201,7 +202,7 @@ public sealed class SettingsForm : Form
             Dock = DockStyle.Top,
             AutoSize = true,
             ColumnCount = 2,
-            RowCount = 6,
+            RowCount = 7,
             Padding = new Padding(0, 6, 0, 0)
         };
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 128));
@@ -226,13 +227,23 @@ public sealed class SettingsForm : Form
         panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 46));
         panel.Controls.Add(_darkThemeCheckBox, 1, 3);
 
-        _statusLabel.AutoSize = true;
+        _startWithWindowsCheckBox.Text = "시작프로그램 등록";
+        _startWithWindowsCheckBox.AutoSize = true;
+        _startWithWindowsCheckBox.Dock = DockStyle.Top;
+        _startWithWindowsCheckBox.Margin = new Padding(0, 8, 0, 3);
+        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 46));
+        panel.Controls.Add(_startWithWindowsCheckBox, 1, 4);
+
+        _statusLabel.AutoSize = false;
+        _statusLabel.AutoEllipsis = true;
+        _statusLabel.Dock = DockStyle.Fill;
+        _statusLabel.TextAlign = ContentAlignment.MiddleLeft;
         _statusLabel.Padding = new Padding(0, 6, 0, 0);
         panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 42));
-        panel.Controls.Add(_statusLabel, 1, 4);
+        panel.Controls.Add(_statusLabel, 1, 5);
 
         panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 48));
-        panel.Controls.Add(CreateButtonPanel(), 1, 5);
+        panel.Controls.Add(CreateButtonPanel(), 1, 6);
 
         return panel;
     }
@@ -324,6 +335,7 @@ public sealed class SettingsForm : Form
         _overrideIpTextBox.Text = settings.OverrideIpAddress;
         _intervalNumericUpDown.Value = Math.Clamp(settings.UpdateIntervalMinutes, 1, 1440);
         _darkThemeCheckBox.Checked = settings.UseDarkTheme;
+        _startWithWindowsCheckBox.Checked = WindowsStartupManager.IsRegistered();
     }
 
     /// <summary>
@@ -342,6 +354,16 @@ public sealed class SettingsForm : Form
         if (settings.HostNames.Count == 0)
         {
             _statusLabel.Text = "업데이트할 호스트를 하나 이상 선택하세요.";
+            return;
+        }
+
+        try
+        {
+            WindowsStartupManager.SetRegistration(settings.StartWithWindows);
+        }
+        catch (Exception ex)
+        {
+            _statusLabel.Text = $"시작프로그램 설정을 변경하지 못했습니다: {ex.Message}";
             return;
         }
 
@@ -432,7 +454,8 @@ public sealed class SettingsForm : Form
             SelectedHostNames = selectedHostNames,
             OverrideIpAddress = _overrideIpTextBox.Text.Trim(),
             UpdateIntervalMinutes = (int)_intervalNumericUpDown.Value,
-            UseDarkTheme = _darkThemeCheckBox.Checked
+            UseDarkTheme = _darkThemeCheckBox.Checked,
+            StartWithWindows = _startWithWindowsCheckBox.Checked
         };
     }
 

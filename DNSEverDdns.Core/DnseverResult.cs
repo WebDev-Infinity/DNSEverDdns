@@ -10,7 +10,9 @@ namespace DNSEverDdns.Core;
 public sealed record DnseverResult(string Type, string Code, string Message, IReadOnlyList<DnseverResultHost> Hosts)
 {
     /// <summary>
-    /// DNSEver 성공 코드 여부를 반환합니다.
+    /// DNSEver 요청이 성공했거나 모든 호스트가 이미 동일한 값으로 반영되어 있는지 반환합니다.
     /// </summary>
-    public bool IsSuccess => Code is "700" or "701";
+    public bool IsSuccess =>
+        Code is "700" or "701"
+        || (Hosts.Count > 0 && Hosts.All(host => host.Code is "720" or "721"));
 }
