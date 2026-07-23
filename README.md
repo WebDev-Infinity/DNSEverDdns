@@ -69,6 +69,7 @@ dotnet publish .\DNSEverDdns.Win\DNSEverDdns.Win.csproj -c Release -r win-x64 --
 ```
 
 게시 설정은 Windows Forms 프로젝트의 `PublishSingleFile` 옵션을 사용합니다.
+별도 설치가 필요 없는 단독 실행 파일입니다.  
 
 ## 참고
 
